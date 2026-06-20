@@ -1,0 +1,31 @@
+# --- BEGIN claude-flow-proyectos ---
+# Bloque agregado por install.sh de claude-flow-proyectos.
+# Para desactivar el flujo: borra este bloque o desinstala con uninstall.sh.
+
+## Flujo de trabajo en proyectos — NIMBUS v3 (carga por escalones)
+
+NIMBUS ya NO se carga entero. Cada sub-protocolo es un **escalón** autónomo en `~/.claude/escalones/<nombre>.md`; el **router** (`~/.claude/ROUTER.md`) mapea la tarea a su(s) escalón(es). Overview en `~/.claude/FLUJO_PROYECTOS.md`. Diseño completo: `decisions/004` del repo `nimbus-flow`.
+
+Cuando {{USER_NAME}} dispare un trigger de trabajo de proyecto (familias abajo): **NO leer el flujo entero.** En su lugar:
+1. Match contra el router (`~/.claude/ROUTER.md` tiene la tabla completa trigger→escalón). Una vez cableado el hook, el router se inyecta cada turno; mientras tanto, consultarlo directamente.
+2. **Candado (de ley, siempre):** declarar en una línea *"esta tarea usa el/los escalón(es) X (e Y), effort recomendado &lt;tier&gt; para la rebanada que sigue, ¿de acuerdo?"* y esperar aprobación/ajuste del Director.
+3. Cargar SOLO ese(esos) escalón(es) de `~/.claude/escalones/`. Triviales/acks → "escalón 0 — nada que cargar".
+
+**Familias de triggers** (la tabla completa vive en el router):
+- **Iniciar / continuar:** "vamos a trabajar en X", "empecemos X", "sigamos/continuemos/retomemos X", "voy a empezar X", "abramos X" → `proyecto-nuevo` / `proyecto-continuar`.
+- **Archivar / borrar:** "archiva/pausa X" (recuperable) vs "borra/elimina/matemos/tíralo X" (destructivo) → `proyecto-borrar-archivar`. Si {{USER_NAME}} no usa "borra"/"elimina"/"tira" literal, asumir **archivar**; borrar requiere doble confirmación explícita.
+- **Evaluación de herramientas:** "evalúa X", "qué uso para X", "compara X vs Y", "build vs reuse" → `evaluacion-herramientas`. Filtro previo: si se resuelve en N líneas de código, decirlo y resolver directo.
+- **Seguridad de repos externos:** "instala/integra/clona/usa este repo", "agreguemos/metamos dep", "copia esto a mi proyecto" → `seguridad-externos`. La seguridad tiene prioridad absoluta; NUNCA asumir autorización implícita aunque auto mode esté activo; aplica también si solo se va a leer el repo (advertencia proporcional).
+- **Filtro de plataforma:** "vale la pena empezar X", "evalúa esta idea contra riesgo de plataforma", "riesgo de que [Anthropic/OpenAI/Google] saque esto nativo" → `filtro-plataforma`. Corre antes de arrancar proyecto nuevo o aterrizar una idea; veredicto DESCARTAR/REESTRUCTURAR/ESCALAR.
+- **Ideas crudas:** "guarda/anota esta idea", "descarta la idea de X" → `ideas-crudas`.
+- **Cerrar sesión:** "nos vemos", "ya cerramos", "ahí la dejamos", "pausa", "córtale" → `cierre-sesion`.
+
+**Regla de comunicación de ley (piso):** antes de codear cualquier rebanada de proyecto, preguntar TODO lo necesario para no construir lo que no era; NUNCA asumir sobre QUÉ construir (el alcance de la rebanada). Frontera con otras reglas del piso: AC2 ("declarar asunción y continuar") aplica a ambigüedad reversible de bajo nivel; esta regla acota la ambigüedad sobre el ALCANCE de lo que se construye; la ambigüedad de PROPÓSITO va por Protocolo de Desvío Crítico. Detalle (cuándo preguntar vs leer el código, una pregunta a la vez, recomendación con tradeoff) en el escalón `rebanada-ready` y en el overview §Reglas de comunicación.
+
+**Principio rector vigente:** paridad voz ↔ texto. El medio (voz vs texto) no debe cambiar lo que se logra. Toda sección nueva se escribe voice-friendly.
+
+Si tienes duda de si aplica → consultar el router (`~/.claude/ROUTER.md`) y declarar el candado, NO leer el flujo entero ni adivinar.
+
+No aplicar para fixes pequeños, dudas sueltas, o exploración rápida. Si {{USER_NAME}} dice "skip grill" / "directo al código" / "modo rápido", respetar sin discusión.
+
+# --- END claude-flow-proyectos ---

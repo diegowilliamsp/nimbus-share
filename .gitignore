@@ -1,0 +1,6 @@
+# Datos personales del usuario (nunca se versionan aquí — viven en ~/.claude/persona/)
+persona/
+# Artefactos de tests / sistema
+*.backup-*
+.DS_Store
+/tmp/
