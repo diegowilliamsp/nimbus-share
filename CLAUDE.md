@@ -7,7 +7,7 @@ Versión genérica e instalable del flujo NIMBUS para Claude Code. Sin datos per
 - **Bash puro** en los scripts (`install.sh`, `uninstall.sh`, `nimbus-doctor.sh`). Sin Python ni Node como dependencia (`jq` es opcional).
 - **Idempotencia:** los scripts se corren N veces sin romper.
 - **No destructivo:** backup de `~/.claude/` antes de tocar nada; NUNCA pisar el `CLAUDE.md` global del usuario (solo anexar el bloque entre marcadores `BEGIN/END claude-flow-proyectos`).
-- **Cero PII:** este repo es genérico. Antes de commitear, `grep -rn 'Diego\|/Users/'` debe dar cero. Los datos del usuario viven en `~/.claude/persona/` (gitignoreado), nunca aquí.
+- **Cero PII:** este repo es genérico. Antes de commitear, verifica con grep que no queden nombres propios ni rutas absolutas de un home de usuario. Los datos del usuario viven en `~/.claude/persona/` (gitignoreado), nunca aquí.
 - **Portabilidad:** cero rutas absolutas hardcodeadas. Paths detectados dinámicamente (`REPO_DIR`, `$HOME`).
 
 ## Estructura
