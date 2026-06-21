@@ -123,6 +123,7 @@ Cada escalón es un archivo autónomo en `flow/escalones/`. Aquí está el mapa 
 | [`ideas-crudas`](./escalones/ideas-crudas.md) | capturar / descartar ideas crudas |
 | [`proyecto-nuevo`](./escalones/proyecto-nuevo.md) | arrancar un proyecto desde cero |
 | [`proyecto-continuar`](./escalones/proyecto-continuar.md) | retomar un proyecto existente |
+| [`adoptar-proyecto`](./escalones/adoptar-proyecto.md) | registrar un proyecto existente en NIMBUS |
 | [`proyecto-borrar-archivar`](./escalones/proyecto-borrar-archivar.md) | archivar o borrar un proyecto |
 | [`rebanada-ready`](./escalones/rebanada-ready.md) | Definition of Ready + recomendación de effort |
 | [`rebanada-done`](./escalones/rebanada-done.md) | Definition of Done |

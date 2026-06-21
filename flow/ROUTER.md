@@ -23,6 +23,7 @@ El Director aprueba o ajusta la profundidad (más/menos escalones) y el effort. 
 |---|---|
 | "empecemos proyecto nuevo", "voy a empezar X", "hagamos un proyecto", "abramos X" | `proyecto-nuevo` |
 | "sigamos con X", "continuemos con X", "retomemos X" | `proyecto-continuar` |
+| "tengo este proyecto y quiero adoptarlo con NIMBUS", "registra/adopta este proyecto en NIMBUS", "usa NIMBUS aquí" | `adoptar-proyecto` |
 | "archiva X", "pausa X indefinido" / "borra el proyecto X", "elimina X", "tíralo" | `proyecto-borrar-archivar` |
 | Claude se traba: muro, dependencia rota, bug duro, regresión de performance | `claude-trabado` |
 | "evalúa X", "qué uso para X", "dame opciones para X", "compara X vs Y", "build vs reuse" | `evaluacion-herramientas` |

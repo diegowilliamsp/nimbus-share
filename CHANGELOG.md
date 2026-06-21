@@ -2,6 +2,12 @@
 
 Formato: [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) · Versionado: [SemVer](https://semver.org/lang/es/).
 
+## [1.1.0] — 2026-06-21
+
+### Escalón nuevo — `adoptar-proyecto`
+
+- Adopta un proyecto que YA existe en NIMBUS: corre `/init` + `/grill-with-docs` y crea `CONTEXT.md`/`ESTADO.md`/`decisions/` sin tocar el código. Es el puente entre `proyecto-nuevo` (desde cero) y `proyecto-continuar` (asume docs existentes). Trigger: "tengo este proyecto y quiero adoptarlo con NIMBUS". Router + índice del overview actualizados. Bump 1.0.0 → 1.1.0.
+
 ## [1.0.0] — 2026-06-20
 
 ### Primera versión distribuible de NIMBUS
