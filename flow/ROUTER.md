@@ -4,11 +4,25 @@
 
 ## Candado — declaración obligatoria de escalones (de ley, siempre)
 
-Antes de responder a una tarea de proyecto, el Constructor declara en una línea:
+Antes de responder a una tarea de proyecto, el Constructor declara el candado como **badge enmarcado**: un marco lo separa del texto normal y de un vistazo se ve el *effort* + cuánto de NIMBUS se carga. Va en bloque de código para que el marco no se deforme.
 
-> *"Esta tarea usa el/los escalón(es) **X** (y **Y**), effort recomendado **&lt;tier&gt;** para la rebanada que sigue. ¿De acuerdo?"*
+```
+╔═ 🧭 NIMBUS ════════════════════════════════════╗
+║ effort: <tier> <medidor> · escalón(es): <lista> (<n>) · ¿de acuerdo?
+╚═════════════════════════════════════════════════╝
+```
 
-El Director aprueba o ajusta la profundidad (más/menos escalones) y el effort. El Constructor recomienda; el switch de effort lo mueve el Director. Para tareas triviales, dudas sueltas o acknowledgments ("dale", "ok"), la declaración es **"escalón 0 — nada que cargar"**.
+- **`<tier>` + `<medidor>`** — tiers en `rebanada-ready` (high es el piso del trabajo de proyecto, por eso el medidor arranca en 3/5): `high ●●●○○` · `xhigh ●●●●○` · `max ●●●●●`.
+- **`<lista>` (`<n>`)** — escalones separados por `+` y el total que se carga.
+- **Trivial / ack** ("dale", "ok", duda suelta) — variante escalón 0, mismo marco:
+
+```
+╔═ 🧭 NIMBUS ════════════════════════════════════╗
+║ escalón 0 — nada que cargar · sigo directo
+╚═════════════════════════════════════════════════╝
+```
+
+El Director aprueba o ajusta la profundidad (más/menos escalones) y el effort. El Constructor recomienda; el switch de effort lo mueve el Director.
 
 ## Cómo se usa el router
 

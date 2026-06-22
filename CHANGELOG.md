@@ -2,6 +2,13 @@
 
 Formato: [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) · Versionado: [SemVer](https://semver.org/lang/es/).
 
+## [1.2.0] — 2026-06-22
+
+### El candado y la recomendación de effort ahora son un badge enmarcado
+
+- El candado (declaración obligatoria de escalón + effort) y la recomendación de effort de `rebanada-ready` pasan de prosa suelta a un **badge enmarcado**: marco box-drawing + `effort: <tier>` con medidor de puntos + escalones cargados, para distinguirse de un vistazo del texto normal.
+- Fuente: `flow/ROUTER.md` §Candado. Medidor: `high ●●●○○ · xhigh ●●●●○ · max ●●●●●` (high es el piso del trabajo de proyecto, por eso arranca en 3/5). Sincronizado en el snippet del piso, el overview, `rebanada-ready` y el recordatorio del hook (en `install.sh`). Bump MINOR 1.1.0 → 1.2.0.
+
 ## [1.1.0] — 2026-06-21
 
 ### Escalón nuevo — `adoptar-proyecto`

@@ -39,4 +39,12 @@ Escala de esfuerzo (eje distinto de `ultracode`):
 
 `ultracode` **no es un tier de esfuerzo** — es un eje aparte: activa orquestación multi-agente (sub-agentes en paralelo, review adversarial), cuesta muchos más tokens y es de pago. El Constructor lo sugiere por separado cuando la rebanada se beneficia de barrido exhaustivo (auditoría amplia, review adversarial, migración grande); el Director lo confirma siempre explícito. Nunca se asume.
 
-Formato de la recomendación (voice-friendly, una línea): *"Effort recomendado para esta rebanada: &lt;tier&gt; porque &lt;razón&gt;. ¿Lo dejamos ahí o lo mueves?"* — y si aplica, sumar *"+ esta rebanada se beneficiaría de `ultracode` por &lt;razón&gt;"*.
+Formato de la recomendación — el **badge enmarcado** de NIMBUS (mismo marco del candado, ver `ROUTER.md` §Candado), en bloque de código:
+
+```
+╔═ 🧭 NIMBUS ════════════════════════════════════╗
+║ effort: <tier> <medidor> · porque <razón> · ¿lo dejamos o lo mueves?
+╚═════════════════════════════════════════════════╝
+```
+
+Medidor: `high ●●●○○` · `xhigh ●●●●○` · `max ●●●●●`. Si la rebanada se beneficia de `ultracode` (eje aparte, ver arriba), sumar una línea dentro del marco: `║ + ultracode sugerido: <razón>`.

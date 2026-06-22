@@ -8,7 +8,7 @@ NIMBUS ya no es un solo documento que se carga entero. Son tres piezas (ver [`de
 
 - **Piso:** lo que se carga SIEMPRE en cada sesión — el `CLAUDE.md` global (principios rectores, roles del meta-sistema, reglas de comunicación, + el bloque `claude-flow-proyectos` con el resumen de triggers y el candado) MÁS el `CLAUDE.md` del proyecto activo. **Este overview NO es piso** — se lee bajo demanda, no en cada sesión (`decisions/004` §Decisión punto 2 — "Piso delgado").
 - **Escalones:** cada sub-protocolo es un archivo autónomo en `flow/escalones/<nombre>.md`. Solo se carga el que la tarea pide, no todo el flujo.
-- **Router + candado:** `flow/ROUTER.md` (entregado por un hook en cada turno) mapea la tarea a sus escalones. Antes de trabajo de proyecto, el candado obliga al Constructor a declarar al Director qué escalón(es) y qué effort usa, para que apruebe o ajuste.
+- **Router + candado:** `flow/ROUTER.md` (entregado por un hook en cada turno) mapea la tarea a sus escalones. Antes de trabajo de proyecto, el candado obliga al Constructor a declarar al Director qué escalón(es) y qué effort usa, para que apruebe o ajuste. La declaración va como **badge enmarcado** (marco + effort con medidor + escalones; formato en `flow/ROUTER.md` §Candado).
 
 Este archivo es el **overview**: el preámbulo de referencia (universal) + el índice de escalones. Se lee bajo demanda, no es piso. El detalle de cada sub-protocolo vive en su escalón.
 
