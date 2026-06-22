@@ -105,10 +105,10 @@ else
   cat "$HOME/.claude/ROUTER.md"
 fi
 echo ""
-echo "RECORDATORIO DE LEY (NIMBUS): si esto es trabajo de proyecto, antes de responder declara"
-echo "el candado como BADGE ENMARCADO (marco + effort <tier> con medidor + escalón(es); formato"
-echo "en ROUTER.md §Candado) y carga SOLO ese(esos) escalón(es) de ~/.claude/escalones/."
-echo "Si es trivial o ack: badge 'escalón 0 — nada que cargar'."
+echo "RECORDATORIO DE LEY (NIMBUS): en CADA turno, antes de responder, declara el candado como"
+echo "BADGE ENMARCADO (marco + effort <tier> con medidor + escalón(es); formato en ROUTER.md"
+echo "§Candado) y carga SOLO ese(esos) escalón(es) de ~/.claude/escalones/. NUNCA omitas el badge:"
+echo "si es trivial o ack, sale igual en variante 'escalón 0 — nada que cargar'."
 HOOK
 chmod +x "$CLAUDE_DIR/hooks/nimbus-router.sh"
 ok "Hook script: $CLAUDE_DIR/hooks/nimbus-router.sh"

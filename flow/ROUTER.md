@@ -4,7 +4,7 @@
 
 ## Candado — declaración obligatoria de escalones (de ley, siempre)
 
-Antes de responder a una tarea de proyecto, el Constructor declara el candado como **badge enmarcado**: un marco lo separa del texto normal y de un vistazo se ve el *effort* + cuánto de NIMBUS se carga. Va en bloque de código para que el marco no se deforme.
+En **cada turno, sin excepción**, el Constructor abre su respuesta con el **badge enmarcado** de NIMBUS: un marco lo separa del texto normal y de un vistazo se ve el *effort* + cuánto de NIMBUS se carga. Sale **completo** cuando hay trabajo de proyecto, y en **variante de escalón 0** cuando no — así siempre queda claro, también cuando NIMBUS no se está usando. Va en bloque de código para que el marco no se deforme.
 
 ```
 ╔═ 🧭 NIMBUS ════════════════════════════════════╗
@@ -67,4 +67,4 @@ Si la tarea es trabajo de proyecto no-trivial pero ningún disparador de la tabl
 - Preguntas sobre cómo funciona algo.
 - Cuando el usuario diga "skip grill", "directo al código", "solo arregla X" o "modo rápido" → respetar sin discusión, sin re-proponer el flujo.
 
-En estos casos la declaración del candado es "escalón 0 — nada que cargar" y se procede directo.
+En estos casos no se carga ningún escalón, pero **el badge igual sale** en su variante de escalón 0 (el marco de "nada que cargar") y se procede directo. El badge **nunca se omite**: es la señal de que NIMBUS no se está usando este turno.

@@ -8,7 +8,7 @@ NIMBUS ya NO se carga entero. Cada sub-protocolo es un **escalón** autónomo en
 
 Cuando {{USER_NAME}} dispare un trigger de trabajo de proyecto (familias abajo): **NO leer el flujo entero.** En su lugar:
 1. Match contra el router (`~/.claude/ROUTER.md` tiene la tabla completa trigger→escalón). Una vez cableado el hook, el router se inyecta cada turno; mientras tanto, consultarlo directamente.
-2. **Candado (de ley, siempre):** declarar el candado como **badge enmarcado** (marco + effort `<tier>` con medidor + escalón(es) que se cargan; formato canónico en `~/.claude/ROUTER.md` §Candado) y esperar aprobación/ajuste del Director.
+2. **Candado (de ley, siempre):** declarar el candado como **badge enmarcado** (marco + effort `<tier>` con medidor + escalón(es) que se cargan; formato canónico en `~/.claude/ROUTER.md` §Candado) y esperar aprobación/ajuste del Director. El badge sale en **cada turno sin excepción**: completo si hay trabajo de proyecto, variante de escalón 0 si no — así siempre se ve si NIMBUS se está usando.
 3. Cargar SOLO ese(esos) escalón(es) de `~/.claude/escalones/`. Triviales/acks → "escalón 0 — nada que cargar".
 
 **Familias de triggers** (la tabla completa vive en el router):

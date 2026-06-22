@@ -2,6 +2,12 @@
 
 Formato: [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) · Versionado: [SemVer](https://semver.org/lang/es/).
 
+## [1.2.1] — 2026-06-22
+
+### El badge del candado sale en cada turno, sin excepción
+
+- Refuerzo sobre el badge de 1.2.0: el flujo deja **explícito y obligatorio** que el badge enmarcado sale en **cada turno** — completo cuando hay trabajo de proyecto, en variante de escalón 0 cuando no — para que siempre se vea de un vistazo si NIMBUS se está usando o no. Sincronizado en `flow/ROUTER.md` (§Candado + §"Cuándo NO aplica"), el snippet del piso y el recordatorio del hook (en `install.sh`). Bump PATCH 1.2.0 → 1.2.1.
+
 ## [1.2.0] — 2026-06-22
 
 ### El candado y la recomendación de effort ahora son un badge enmarcado
