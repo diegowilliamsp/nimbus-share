@@ -90,26 +90,10 @@ else
   ok "Bloque NIMBUS anexado (no se tocó el resto de tu CLAUDE.md)"
 fi
 
-# --- 7. Hook del candado (portable, con $HOME, no rutas absolutas) ---
-say "Instalando el hook del candado..."
+# --- 7. Hook del candado (versionado en flow/hooks/, portable, con $HOME) ---
+say "Instalando el hook del candado (medidor de contexto/sesión + 💾 guardado)..."
 mkdir -p "$CLAUDE_DIR/hooks"
-cat > "$CLAUDE_DIR/hooks/nimbus-router.sh" <<'HOOK'
-#!/usr/bin/env bash
-# Hook UserPromptSubmit de NIMBUS: entrega el router + el mandato del candado en cada turno.
-if [ -f "$HOME/.claude/.nimbus-onboarding-pending" ]; then
-  echo "NIMBUS sin configurar — di 'configura NIMBUS' (o /nimbus-setup) para personalizarlo a tu gusto."
-fi
-if [ ! -f "$HOME/.claude/ROUTER.md" ]; then
-  echo "AVISO NIMBUS: ~/.claude/ROUTER.md no encontrado — revisar install.sh."
-else
-  cat "$HOME/.claude/ROUTER.md"
-fi
-echo ""
-echo "RECORDATORIO DE LEY (NIMBUS): en CADA turno, antes de responder, declara el candado como"
-echo "BADGE ENMARCADO (marco + effort <tier> con medidor + escalón(es); formato en ROUTER.md"
-echo "§Candado) y carga SOLO ese(esos) escalón(es) de ~/.claude/escalones/. NUNCA omitas el badge:"
-echo "si es trivial o ack, sale igual en variante 'escalón 0 — nada que cargar'."
-HOOK
+place "$REPO_DIR/flow/hooks/nimbus-router.sh" "$CLAUDE_DIR/hooks/nimbus-router.sh"
 chmod +x "$CLAUDE_DIR/hooks/nimbus-router.sh"
 ok "Hook script: $CLAUDE_DIR/hooks/nimbus-router.sh"
 

@@ -2,6 +2,20 @@
 
 Formato: [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) · Versionado: [SemVer](https://semver.org/lang/es/).
 
+## [1.3.0] — 2026-06-22
+
+### ESTATUS v3.4 — el candado pasa de badge a bloque ESTATUS al final, con medidor de contexto/sesión y 💾 guardado
+
+Salto del candado al modelo v3.4 (paridad con el motor de NIMBUS): de "badge enmarcado que abre la respuesta" a **bloque ESTATUS enmarcado al final** de cada turno, calculado en parte por el hook.
+
+- **Bloque ESTATUS al final, marco abierto:** el candado deja de abrir la respuesta y pasa a **cerrarla** — marco **abierto a la derecha** (regla larga arriba/abajo, contenido con `│`, sin borde derecho `║`), robusto a emojis doble-ancho y ancho de terminal. Cada línea arranca con ícono. **Nunca omite áreas:** veredicto (✅/📍 + ▶️/⏳) + 💾 guardado + 🎚️ effort + 🧩 escalón + 📊 contexto.
+- **Hook con medidor + 💾 (nuevo):** el hook `flow/hooks/nimbus-router.sh` (antes embebido en `install.sh`, ahora **versionado** y copiado/symlinkeado por el instalador) calcula cada turno el **medidor de contexto** (barra `~%` por bytes del transcript) + **sesión** (tiempo/turnos) y la línea **`💾 guardado`** (`git status` + `rev-list` en el cwd, con guard de repo). **Fail-open:** si la medición falla, queda en `s/d` y el turno no se rompe.
+- **Comandos accionables por línea:** `🎚️ effort` lleva `/effort`; `📊 contexto` recomienda comando por banda — verde nada · ámbar `/compact` · rojo `/clear` · crítico cerrar sesión. **Regla de seguridad:** antes de recomendar `/compact` o `/clear`, el Constructor commitea sin pedir permiso (limpiar contexto implica que todo está guardado).
+- **🧩 escalón = timeline de hitos:** riel de las estaciones de NIMBUS (`arranque(4) → rebanada(4) → decisión(3) → cierre(2)` + `setup(1)` onboarding = 14 escalones), `◆` en la actual, que se abre y lista sus escalones numerados.
+- **Cierre de sesión = commit + push:** `cierre-sesion` (paso 6) pasa a **commit + push** (el push lo autoriza el cierre, con guards: solo la rama actual a su upstream, nunca `--force`).
+- **Limpieza para compartir:** removidas las referencias colgantes a `decisions/004` y al repo personal `nimbus-flow` en el ROUTER, el snippet, el overview y los escalones (el repo compartido no tiene esa carpeta).
+- Sincronizado: ROUTER §Candado (fuente), snippet del piso, overview, `rebanada-ready`, `cierre-sesion`, `install.sh`, hook versionado. Bump MINOR 1.2.1 → 1.3.0.
+
 ## [1.2.1] — 2026-06-22
 
 ### El badge del candado sale en cada turno, sin excepción

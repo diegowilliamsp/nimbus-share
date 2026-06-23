@@ -1,6 +1,6 @@
 # Escalón: cierre-sesion — fin de sesión, ESTADO.md, persistencia, retros
 
-> **Escalón del flujo NIMBUS (v3 — carga por escalones, ver [`decisions/004`](../../decisions/004-carga-dinamica-por-escalones-con-candado-hook.md)).** Se carga solo cuando dispara su trigger; asume el **piso** cargado (principios rectores, roles del meta-sistema y reglas de comunicación del `CLAUDE.md` global). No requiere el resto del flujo.
+> **Escalón del flujo NIMBUS (v3 — carga por escalones).** Se carga solo cuando dispara su trigger; asume el **piso** cargado (principios rectores, roles del meta-sistema y reglas de comunicación del `CLAUDE.md` global). No requiere el resto del flujo.
 
 ## Cuándo carga este escalón (triggers)
 
@@ -30,8 +30,8 @@ Cerrar una sesión sin actualizar `ESTADO.md` es como cerrar el restaurante sin 
    - Decisión arquitectónica o con alternativas descartadas → crear `decisions/NNN-<nombre>.md` con la plantilla ADR (escalón `evaluacion-herramientas`).
 4. **Blockers nuevos** → sección "Blockers / pendientes externos".
 5. **Próxima rebanada** → confirmar con el usuario y dejarla en "Próximo".
-6. **Commit:** `git add . && git commit -m "estado: <resumen en 1 línea>"`. Si hay código de la rebanada que no debería commitearse junto con el estado (ej. WIP que rompe el build), hacer commits separados: uno del código y otro del `ESTADO.md`.
-7. **Resumen al usuario en 3-4 líneas:** dónde cerramos, qué quedó en `ESTADO.md`, próxima rebanada. Esto es lo último que ve el usuario.
+6. **Commit + push:** `git add -A && git commit -m "estado: <resumen en 1 línea>"` y luego `git push`. **El push está autorizado como parte del cierre** — cerrar sesión = dejar el trabajo guardado *y* sincronizado con el remoto; no requiere Luz Verde aparte (la orden de cierre ES la autorización). Si hay código de la rebanada que no debería commitearse junto con el estado (ej. WIP que rompe el build), hacer commits separados: uno del código y otro del `ESTADO.md`, y pushear ambos. **Guards:** push solo de la rama actual a su upstream; nunca `--force`; si no hay upstream (`git push -u origin <rama>` la primera vez) o el push falla, reportar al Director y no improvisar. El push del cierre es la única acción del checklist con efecto externo.
+7. **Resumen al usuario en 3-4 líneas:** dónde cerramos, qué quedó en `ESTADO.md`, próxima rebanada, y que **quedó pusheado** (o el detalle si el push no se pudo). Esto es lo último que ve el usuario.
 
 **Si el commit falla por pre-commit hook** → no hacer `--no-verify`. Arreglar lo que el hook reclame y crear un commit nuevo. Si el código no pasa los checks pero igual hay que cerrar, commitear solo el `ESTADO.md` con un mensaje explícito ("estado: cierre con código WIP no commiteado").
 
