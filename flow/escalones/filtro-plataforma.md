@@ -25,7 +25,7 @@
 
 Sub-protocolo que se invoca cuando {{USER_NAME}} anuncia intención de arrancar trabajo nuevo: proyecto completo nuevo, idea cruda que se va a aterrizar a proyecto, o feature ambiciosa dentro de un proyecto existente que genera dependencia estratégica nueva del proyecto entero. Filtra ideas que podrían ser "tierra rentada" — funciones que las plataformas grandes (Anthropic, OpenAI, Google) podrían integrar nativamente en 6-12 meses, dejando el proyecto irrelevante.
 
-Origen: reporte estratégico del Director adoptado el 2026-05-22. Tres mitigaciones del Constructor aplicadas al transcribir: (a) datos sin fuente primaria etiquetados como [CONJETURA] heredada del reporte; (b) "Detección de Drift" del reporte renombrada en NIMBUS como "Drift de plataforma" para evitar choque semántico con `arquitectura-mando-v2.2.0` §Detección de drift que es sobre SHAs de archivos en handoffs YAML; (c) conceptos "Maturity Premium" y "Bucle de Datos" marcados como operacionalización-pendiente cuando se apliquen a proyecto concreto.
+Nota sobre el filtro: la sección 4 se llama "Drift de plataforma" para distinguirla de otros usos de la palabra "drift". Los datos sin fuente primaria van etiquetados como [CONJETURA]; y conceptos como "Maturity Premium" y "Bucle de Datos" se operacionalizan (se les define una métrica concreta) cuando se aplican a un proyecto real.
 
 ## Las seis secciones del filtro
 
@@ -73,7 +73,7 @@ El Constructor exige respuestas satisfactorias a las cinco antes de proceder con
 1. **Prueba del Problema del Lunes.** ¿Es esta una prioridad máxima que el cliente revisará el lunes a primera hora porque afecta sus ingresos directos? Si la respuesta es "es interesante pero no urgente", probable Zona de Muerte.
 2. **Hipótesis LIMO (Less-Is-More).** ¿Contamos con las plantillas cognitivas (trazas de razonamiento experto del dominio) que la IA generalista no posee para este nicho? Conexión directa con el principio de Plantillas Cognitivas (Hipótesis LIMO) del piso — pocos ejemplos curados superan a muchos ejemplos genéricos.
 3. **Bucle de Datos (Data Flywheel).** ¿El producto se vuelve más inteligente con cada corrección que el usuario hace? Operacionalización pendiente cuando se aplique a proyecto concreto: definir métrica cuantitativa de "más inteligente" (accuracy en eval interno, precision/recall en muestra de validación, tiempo a primera corrección, tasa de overrides, etc.).
-4. **Drift de plataforma.** Si el modelo base mejora mañana, ¿el negocio se vuelve más valioso o más irrelevante? Si "más irrelevante", probable Zona de Muerte; si "más valioso" (el motor del proyecto se hace más capaz con mejor modelo subyacente), Zona de Poder. **Renombrado en NIMBUS desde "Detección de Drift" del reporte fuente para evitar choque semántico con el bloque `arquitectura-mando-v2.2.0` §Detección de drift, que es sobre SHAs de archivos en handoffs YAML inter-agente.**
+4. **Drift de plataforma.** Si el modelo base mejora mañana, ¿el negocio se vuelve más valioso o más irrelevante? Si "más irrelevante", probable Zona de Muerte; si "más valioso" (el motor del proyecto se hace más capaz con mejor modelo subyacente), Zona de Poder.
 5. **Maturity Premium.** ¿El cliente está dispuesto a pagar más por confianza, cumplimiento del proceso, auditabilidad de resultados? Operacionalización pendiente cuando se aplique a proyecto concreto: definir cómo se mide la prima del cliente sobre solución genérica equivalente (USD adicional por mes, % adicional sobre solución base, etc.).
 
 ### 6. Lógica de Decisión (Matriz de Acción)

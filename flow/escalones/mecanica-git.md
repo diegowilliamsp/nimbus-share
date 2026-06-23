@@ -8,7 +8,7 @@
 
 ## Dependencias declaradas
 
-- El backup destructivo refuerza los bloques `side-effects-management-v2.3.0` e `irreversibilidad-sobre-confianza-v2.3.0` del `CLAUDE.md` global (piso).
+- El backup antes de una operación destructiva refuerza un principio del piso: lo irreversible exige red de seguridad (backup) y confirmación antes de actuar.
 - `/review` es skill built-in de Claude Code (review formal antes de mergear un PR).
 
 ---
