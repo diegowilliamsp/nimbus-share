@@ -2,6 +2,19 @@
 
 Formato: [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) · Versionado: [SemVer](https://semver.org/lang/es/).
 
+## [1.4.0] — 2026-06-23
+
+### ESTATUS v3.5 + v3.6 — roles del pipeline + panel de instrumentos
+
+Paridad con el motor: el candado gana la sub-línea de roles y el panel visual.
+
+- **🎭 ROLES (sub-línea siempre debajo de effort):** muestra la cadena del pipeline de mando con íconos (🔄 Transformador · 🧠 Analista · 👷 Constructor · 🔍 Auditor; 🧭 Director = tú). `👷 directo` por default; cadenas como `🧠→👷→🔍` para decisiones con plan + revisión. Siempre presente: su ausencia señala que la feature no corrió. Los roles se definen **autocontenidos** en `rebanada-ready` (no dependen de config externa al flujo).
+- **Panel de instrumentos (Tablero):** 💾 medidor de respaldo (semáforo + barra: sin guardar 🔴 → local 🟡 → pusheado 🟢), 🎚️ tacómetro de color (high 🟢 / xhigh 🟡 / max 🔴), 📊 contexto con semáforo de banda (🟢/🟡/🔴/🆘/⚪). El hook dibuja 💾 y 📊; el Constructor pinta 🎚️/🎭/🧩.
+- **Hook (`flow/hooks/nimbus-router.sh`):** reescritos los segmentos de 💾 y 📊 con semáforos + barras. Fail-open intacto, `bash -n` OK.
+- **Sincronizado:** `flow/ROUTER.md` §Candado (descripciones + plantillas), `flow/escalones/rebanada-ready.md`, `flow/CLAUDE.md.snippet`, `flow/FLUJO_PROYECTOS.md`.
+- Sanitización: los roles se documentan **inline** (sin referencias al sistema personal del autor); limpiada una ref colgante en `rebanada-ready`. 0 PII en lo migrado.
+- Bump MINOR 1.3.0 → 1.4.0.
+
 ## [1.3.0] — 2026-06-22
 
 ### ESTATUS v3.4 — el candado pasa de badge a bloque ESTATUS al final, con medidor de contexto/sesión y 💾 guardado

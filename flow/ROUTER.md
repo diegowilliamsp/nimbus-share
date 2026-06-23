@@ -6,14 +6,15 @@
 
 En **cada turno, sin excepción**, el Constructor **cierra** su respuesta con el **bloque ESTATUS enmarcado** de NIMBUS — **siempre al final, nunca arriba**, para que el Director lo lea sin tener que subir a buscarlo: es el veredicto que orienta qué sigue. El marco es **abierto a la derecha**: regla larga arriba y abajo, contenido con barra izquierda `│`, **sin borde derecho**. Así no se rompe nunca aunque el contenido sea largo o los emojis sean doble-ancho — el borde derecho cerrado (`║ … ║`) era frágil justo por eso. Cada línea **arranca con ícono** para distinguirse de la prosa. Va en bloque de código para que el marco no se deforme.
 
-**Regla de ley — el ESTATUS nunca omite áreas.** En el bloque de trabajo de proyecto salen SIEMPRE las cinco áreas, en orden, sin colapsar ni saltarse ninguna: **veredicto** (dos líneas), **💾 guardado**, **🎚️ effort**, **🧩 escalón** (mapa del 100% de NIMBUS), **📊 contexto**. La única excepción es la **variante de escalón 0** (NIMBUS inactivo este turno), que es señal mínima.
+**Regla de ley — el ESTATUS nunca omite áreas.** En el bloque de trabajo de proyecto salen SIEMPRE las cinco áreas, en orden, sin colapsar ni saltarse ninguna: **veredicto** (dos líneas), **💾 guardado**, **🎚️ effort** (con su sub-línea **🎭 roles** siempre debajo), **🧩 escalón** (mapa del 100% de NIMBUS), **📊 contexto**. La sub-línea **🎭 roles también es obligatoria** en el bloque de proyecto: sale en cada turno aunque la cadena sea `👷 directo` — así su **ausencia señala un fallo** (la feature no corrió), no se confunde con "fue directo a propósito". La única excepción es la **variante de escalón 0** (NIMBUS inactivo este turno), que es señal mínima (ahí no hay effort ni roles).
 
 Cada línea lleva su ícono:
 - **veredicto** — siempre **dos líneas** (estado + qué sigue):
   - Primera: **✅ se hizo** al cerrar una rebanada · **📍 aquí vamos** al retomar.
   - Segunda: **▶️ sigue** (del roadmap, leído de `ESTADO.md`) — **obligatoria, nunca se omite**: es "con qué seguimos". Si lo hecho quedó **fuera del roadmap**, va **⏳ sigue · — dime qué sigue** (no se puede recomendar siguiente).
-- **💾 guardado** — estado de guardado del repo en el cwd: `sin guardar` (hay cambios sin commitear) · `limpio · N sin pushear` · `limpio · pusheado` · `limpio · sin upstream`. Lo **calcula el hook** (`git status --porcelain` + `git rev-list --count @{u}..HEAD` en el cwd, con guard "¿es repo?") y lo entrega como línea `ESTADO DE GUARDADO`; el Constructor lo copia TAL CUAL. Fuera de un repo git el hook lo omite y el área no aplica.
-- **🎚️ effort** — tier + medidor + su comando **`/effort`**. Tiers en `rebanada-ready` (high es el piso del trabajo de proyecto, por eso el medidor arranca en 3/5): `high ●●●○○` · `xhigh ●●●●○` · `max ●●●●●`. El Constructor recomienda; el switch lo mueve el Director con `/effort`. El Constructor NO auto-cambia su effort a media sesión.
+- **💾 GUARDADO** — **medidor de respaldo** del repo en el cwd, dibujado por el hook: semáforo + barra de 10 celdas (qué tan respaldado está tu trabajo) + texto. Tres lecturas: `🔴 ░░░░░░░░░░ sin guardar · N` (N cambios sin commitear, 0% respaldado) · `🟡 █████░░░░░ limpio · N⇡` (commiteado local, N sin pushear, ~50%) · `🟢 ██████████ pusheado` (100%, todo en remoto). El hook lo calcula (`git status --porcelain` + `git rev-list --count @{u}..HEAD`, guard "¿es repo?") y lo entrega como línea `ESTADO DE GUARDADO`; el Constructor lo copia **TAL CUAL** (semáforo y barra incluidos). Fuera de un repo git el hook lo omite y el área no aplica.
+- **🎚️ EFFORT** — **tacómetro**: semáforo de zona + barra proporcional + tier + su comando **`/effort`**. `high 🟢 ▰▰▰▱▱` (crucero, piso del trabajo de proyecto) · `xhigh 🟡 ▰▰▰▰▱` · `max 🔴 ▰▰▰▰▰` (a fondo). El color sube con la potencia. Lo pinta el **Constructor** (el hook NO conoce el effort): recomienda; el switch lo mueve el Director con `/effort`. El Constructor NO auto-cambia su effort a media sesión. Tiers en `rebanada-ready`.
+  - **🎭 ROLES (sub-línea SIEMPRE debajo de effort)** — en cada turno de proyecto, debajo de effort sale la sub-línea `🎭 ROLES` con la cadena del **pipeline de mando** de NIMBUS, dibujada con **íconos**: 🔄 Transformador (convierte tu idea cruda en un enunciado claro) · 🧠 Analista (arma el plan / compara opciones) · 👷 Constructor (Claude Code, ejecuta y escribe el código) · 🔍 Auditor (revisa adversarialmente lo hecho); el Director eres tú (🧭). `👷 directo` = la mayoría de las tareas (sin pipeline, el default); cadenas como `🧠→👷→🔍` para decisiones que ameritan plan + revisión. **Siempre presente**, aunque sea `👷 directo`: su ausencia señala que la feature no corrió. La pinta el **Constructor por juicio** (NO el hook, a diferencia de 💾 y 📊); tú decides activar el pipeline multi-rol (es opt-in, nunca se asume). Cuándo usar cada cadena: en `rebanada-ready`.
 - **🧩 escalón** — primero los cargados este turno (`cargado(s): <lista> (<n>)`), luego el **timeline de NIMBUS**: un riel horizontal de las estaciones con su número de escalones entre paréntesis, con `◆` en la estación actual (`▾ estás aquí`). La **estación actual se abre** y lista sus escalones **numerados (1..N)** con el activo marcado `▸ N. … ← aquí` y una glosa corta; las demás quedan como `○` (cerradas). Inventario de estaciones y sus escalones:
   - **arranque (4)** — `nuevo` empezar de cero · `continuar` retomar existente · `adoptar` meter a NIMBUS un proyecto ya hecho · `borrar` archivar/eliminar.
   - **rebanada (4)** — `ready` alistar la tajada (DoR+effort) · `done` cerrarla (DoD) · `trabado` destrabarte (muro/bug/perf) · `git` commits/branches/backup.
@@ -21,38 +22,37 @@ Cada línea lleva su ícono:
   - **cierre (2)** — `ideas` guardar/descartar ideas crudas · `cierre` cerrar sesión (commit+push).
   - **setup (1)** — `onboarding` personalizar NIMBUS a tu gusto (una vez).
   (Las estaciones = el 100% de NIMBUS = 14 escalones (4+4+3+2+1). Estilo "hitos" + estación expandible.)
-- **📊 contexto** — el MEDIDOR que inyecta el hook cada turno (barra de contexto `~%` + sesión `tiempo/turnos`) **con su comando recomendado según la banda**: verde (sano) → nada · ámbar → `→ /compact` · rojo → `→ /clear` · crítico → `→ cerrar sesión`. Es una **estimación** por tamaño de la conversación; el hook ya añade el comando al final del medidor, así que se copia TAL CUAL. Cortes de banda calibrables en el hook (`CTX_AMBER_PCT`/`CTX_RED_PCT`/`CTX_CRIT_PCT`).
+- **📊 CONTEXTO** — el MEDIDOR del hook: **semáforo de banda + barra de 10 celdas + `~%` + sesión** + comando recomendado. `🟢` sano (nada) · `🟡 → /compact` · `🔴 → /clear` · `🆘 → cerrar sesión` · `⚪ s/d` (sin lectura: el hook no pudo medir el transcript este turno). Es una **estimación** por tamaño de la conversación; el hook ya dibuja semáforo+barra+comando, así que se copia **TAL CUAL**. Cortes de banda calibrables en el hook (`CTX_AMBER_PCT`/`CTX_RED_PCT`/`CTX_CRIT_PCT`).
   - **Regla de seguridad (de ley):** ANTES de que el ESTATUS muestre `→ /compact` o `→ /clear`, el Constructor **commitea el trabajo SIN pedir permiso** ("solo es guardar", autorizado por el Director). Recomendar limpiar contexto implica que TODO está guardado: nunca sugerir `/compact` o `/clear` con trabajo sin commitear.
 
 Caso típico (cerrando una rebanada con roadmap):
 
 ```
-┌─ 🧭 NIMBUS · ESTATUS ───────────────────────────
+┌─ 🧭 NIMBUS · ESTATUS ───────────────────────────────
 │ ✅ se hizo  · <rebanada cerrada>
 │ ▶️ sigue    · <siguiente del roadmap>
-│ 💾 guardado · <sin guardar | limpio · N sin pushear | limpio · pusheado>
-│ 🎚️ effort   · <tier> <medidor> · /effort
-│ 🧩 escalón  · cargado(s): <lista> (<n>) · ▾ estás aquí
-│   ○─arranque(4)─◆─REBANADA(4)─○─decisión(3)─○─cierre(2)─▶
-│   REBANADA(4) · estás en "ready":
-│    ▸ 1. ready · alistar la tajada     ← aquí
-│      2. done · cerrarla
-│      3. trabado · destrabarte
-│      4. git · commits / branches
-│ 📊 contexto · <medidor del hook · trae → /compact|/clear|cerrar si aplica>
-└─ ¿de acuerdo? ──────────────────────────────────
+│ ╶────────────────────────────────────────────────
+│ 💾 GUARDADO  🟢 ██████████ pusheado          ← del hook, TAL CUAL
+│ 🎚️ EFFORT    🟢 ▰▰▰▱▱ high                        /effort
+│   🎭 ROLES   👷 directo
+│ 🧩 ESCALÓN   ○ arranque(4) ─◆─ REBANADA(4) ─ decisión(3) ─ cierre(2) ─ setup(1)
+│    rebanada › ▸1 ready · 2 done · 3 trabado · 4 git
+│ 📊 CONTEXTO  🟢 ▓▓▓▓░░░░░░ ~38% · 12min/8t    ← del hook, TAL CUAL
+└─ ¿de acuerdo? ──────────────────────────────────────
 ```
+
+Las líneas `💾 GUARDADO` y `📊 CONTEXTO` el Constructor las copia **tal cual** del hook (semáforo + barra ya dibujados). `🎚️ EFFORT` (tacómetro de color), `🎭 ROLES` (íconos) y `🧩 ESCALÓN` (riel) las pinta el Constructor. El riel mantiene los nombres + conteos de las estaciones (`◆` en la actual) y debajo lista la estación abierta en una línea, con `▸` en el escalón activo.
 
 Al **retomar**, la primera línea es `📍 aquí vamos · <dónde estamos>` en vez de `✅ se hizo`; la línea `▶️ sigue` queda igual, nunca se omite. En el timeline, mover el `◆` a la estación actual y nombrar en `cargado(s):` el/los escalón(es) de este turno.
 
 Trivial / ack ("dale", "ok", duda suelta) — variante escalón 0 (NIMBUS inactivo), señal mínima, mismo marco abierto:
 
 ```
-┌─ 🧭 NIMBUS · ESTATUS ───────────────────────────
-│ 💾 guardado · <estado git>
-│ 🧩 escalón  · 0 — nada que cargar · sigo directo
-│ 📊 contexto · <medidor del hook>
-└─────────────────────────────────────────────────
+┌─ 🧭 NIMBUS · ESTATUS ───────────────────────────────
+│ 💾 GUARDADO  🟢 ██████████ pusheado          ← del hook, TAL CUAL
+│ 🧩 ESCALÓN   0 — nada que cargar · sigo directo
+│ 📊 CONTEXTO  🟢 ▓▓▓▓░░░░░░ ~38% · 12min/8t    ← del hook, TAL CUAL
+└─────────────────────────────────────────────────────
 ```
 
 El Director aprueba o ajusta la profundidad (más/menos escalones) y el effort. El Constructor recomienda; el switch de effort lo mueve el Director.

@@ -11,7 +11,7 @@ if [ ! -t 0 ]; then
 fi
 
 # --- 2. Medidor CONTEXTO + SESIÓN (todo envuelto; nunca aborta el turno) ---
-gauge="s/d (medición no disponible)"
+gauge="⚪ s/d"
 {
   CTX_FULL_BYTES=1500000   # tamaño de conversación (bytes del transcript) tratado como "lleno / conviene reiniciar"; tunable
   CTX_AMBER_PCT=60         # ámbar   → recomendar /compact   (calibrable)
@@ -33,10 +33,11 @@ gauge="s/d (medición no disponible)"
 
   # Banda del medidor -> comando recomendado (verde=nada / ámbar=/compact / rojo=/clear / crítico=cerrar)
   ctx_cmd=""
+  ctx_dot="🟢"
   if [ -n "$pct" ]; then
-    if   [ "$pct" -ge "$CTX_CRIT_PCT" ]; then ctx_cmd="→ cerrar sesión"
-    elif [ "$pct" -ge "$CTX_RED_PCT"  ]; then ctx_cmd="→ /clear"
-    elif [ "$pct" -ge "$CTX_AMBER_PCT" ]; then ctx_cmd="→ /compact"
+    if   [ "$pct" -ge "$CTX_CRIT_PCT" ]; then ctx_cmd="→ cerrar sesión"; ctx_dot="🆘"
+    elif [ "$pct" -ge "$CTX_RED_PCT"  ]; then ctx_cmd="→ /clear";        ctx_dot="🔴"
+    elif [ "$pct" -ge "$CTX_AMBER_PCT" ]; then ctx_cmd="→ /compact";      ctx_dot="🟡"
     fi
   fi
 
@@ -84,9 +85,9 @@ gauge="s/d (medición no disponible)"
     [ -n "$elapsed_lbl" ] && sess=" · sesión ${elapsed_lbl}/${turns}t"
     cmd_sfx=""
     [ -n "$ctx_cmd" ] && cmd_sfx=" ${ctx_cmd}"
-    gauge="${bar} ~${pct}%${sess}${cmd_sfx}"
+    gauge="${ctx_dot} ${bar} ~${pct}%${sess}${cmd_sfx}"
   elif [ -n "$elapsed_lbl" ]; then
-    gauge="sesión ${elapsed_lbl}/${turns}t (contexto s/d)"
+    gauge="⚪ s/d · sesión ${elapsed_lbl}/${turns}t"
   fi
 } 2>/dev/null
 
@@ -94,13 +95,15 @@ gauge="s/d (medición no disponible)"
 savestate=""
 {
   if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
-    if [ -n "$(git status --porcelain 2>/dev/null)" ]; then
-      savestate="sin guardar"
+    dirty=$(git status --porcelain 2>/dev/null)
+    if [ -n "$dirty" ]; then
+      n=$(printf '%s\n' "$dirty" | grep -c .)
+      savestate="🔴 ░░░░░░░░░░ sin guardar · ${n}"
     else
       ahead=$(git rev-list --count '@{u}..HEAD' 2>/dev/null)
-      if   [ -z "$ahead" ];                  then savestate="limpio · sin upstream"
-      elif [ "$ahead" -gt 0 ] 2>/dev/null;   then savestate="limpio · ${ahead} sin pushear"
-      else                                        savestate="limpio · pusheado"
+      if   [ -z "$ahead" ];                  then savestate="🟡 █████░░░░░ limpio · local"
+      elif [ "$ahead" -gt 0 ] 2>/dev/null;   then savestate="🟡 █████░░░░░ limpio · ${ahead}⇡"
+      else                                        savestate="🟢 ██████████ pusheado"
       fi
     fi
   fi
@@ -126,7 +129,8 @@ echo "MEDIDOR DE ESTE TURNO (estimación; úsalo TAL CUAL en la línea '📊 con
 echo ""
 echo "RECORDATORIO DE LEY (NIMBUS): en CADA turno, CIERRA tu respuesta (SIEMPRE al final, nunca arriba)"
 echo "con el bloque ESTATUS enmarcado — formato canónico en ROUTER.md §Candado: líneas con ícono"
-echo "(🎚️ effort con medidor · 🧩 escalón(es)+conteo · 📊 contexto usando el MEDIDOR de arriba · y según"
+echo "(🎚️ effort con medidor [+ sub-línea 🎭 roles del pipeline SIEMPRE debajo — 👷 directo por default] ·"
+echo "🧩 escalón(es)+conteo · 📊 contexto usando el MEDIDOR de arriba · y según"
 echo "el caso ✅ se hizo / ▶️ sigue (roadmap) / ⏳ esperando si es fuera de roadmap). Carga SOLO ese(esos)"
 echo "escalón(es) de ~/.claude/escalones/. NUNCA omitas el ESTATUS: trivial o ack => variante 'escalón 0'."
 echo ""

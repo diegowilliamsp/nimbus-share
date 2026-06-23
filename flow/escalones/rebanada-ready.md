@@ -35,14 +35,46 @@ Escala de esfuerzo (eje distinto de `ultracode`):
 |---|---|
 | **high** | Default. Rebanada normal: lógica clara, pocos archivos, sin incertidumbre técnica fuerte. |
 | **xhigh** | Varias incertidumbres técnicas activas, refactor que toca varios módulos, diseño no trivial. |
-| **max** | Decisión arquitectónica, debugging duro (`/diagnose`), o acción de reversibilidad incierta/cara (ver bloque `irreversibilidad-sobre-confianza-v2.3.0` del `CLAUDE.md` global). |
+| **max** | Decisión arquitectónica, debugging duro (`/diagnose`), o acción de reversibilidad incierta/cara (lo irreversible sube el tier, no la confianza). |
 
 `ultracode` **no es un tier de esfuerzo** — es un eje aparte: activa orquestación multi-agente (sub-agentes en paralelo, review adversarial), cuesta muchos más tokens y es de pago. El Constructor lo sugiere por separado cuando la rebanada se beneficia de barrido exhaustivo (auditoría amplia, review adversarial, migración grande); el Director lo confirma siempre explícito. Nunca se asume.
 
 Formato de la recomendación — va en la línea de effort del **bloque ESTATUS al final** de la respuesta (ver `ROUTER.md` §Candado):
 
 ```
-│ 🎚️ effort   · <tier> <medidor> · porque <razón> · /effort para moverlo
+│ 🎚️ EFFORT    <tacómetro> <tier>                   /effort
 ```
 
-Medidor: `high ●●●○○` · `xhigh ●●●●○` · `max ●●●●●`. Si la rebanada se beneficia de `ultracode` (eje aparte, ver arriba), sumar una línea dentro del marco: `│ + ultracode sugerido: <razón>`.
+Medidor = **tacómetro de color** (semáforo de zona + barra proporcional): `high 🟢 ▰▰▰▱▱` (crucero) · `xhigh 🟡 ▰▰▰▰▱` · `max 🔴 ▰▰▰▰▰` (a fondo) — el color sube con la potencia. Si la rebanada se beneficia de `ultracode` (eje aparte, ver arriba), sumar una línea dentro del marco: `│ + ultracode sugerido: <razón>`.
+
+## Recomendación de roles del pipeline al arrancar la rebanada
+
+Junto con el effort —y como la misma decisión, "cómo atacamos esta tajada"— el Constructor recomienda qué **roles del pipeline de mando** de NIMBUS conviene activar para la rebanada. Los roles:
+
+- **🧭 Director** — tú. Apruebas, decides, das la luz verde.
+- **🔄 Transformador** — convierte tu idea cruda en un enunciado claro y estructurado (no inventa lo que falta; pregunta).
+- **🧠 Analista** — arma el plan o compara opciones (no escribe el código final).
+- **👷 Constructor** — Claude Code: ejecuta y escribe el código.
+- **🔍 Auditor** — revisa adversarialmente lo hecho (señala fallos; no propone la solución).
+
+La recomienda el **Constructor por juicio** sobre la naturaleza de la rebanada; tú decides. Activar el pipeline multi-rol (Transformador/Analista/Auditor como sub-agentes en paralelo) cuesta más tokens y es **opt-in explícito** — nunca se asume; la mayoría de las tareas las hace el Constructor directo.
+
+Cada rol se dibuja con su **ícono** (waypoints encadenados con `→`). El Constructor siempre codea, así que 👷 aparece en toda cadena que llega a código.
+
+Vocabulario de cadenas (mapeo caso → roles):
+
+| Cadena (íconos) | Cuándo |
+|---|---|
+| **`👷` Constructor directo** | Ejecución pura, fix chico, housekeeping, doc/redacción. Es el **default**. |
+| **`👷→🔍` → Auditor** | Cierre de rebanada con código nuevo o sensible (revisión adversarial). |
+| **`🧠→👷→🔍` Analista → Constructor → Auditor** | Decisión con alternativas, integración nueva, cambio de stack (plan + revisión). |
+| **`🔄→🧠→👷→🔍` pipeline completo** | Idea cruda ambigua que se va a aterrizar de cero. |
+
+Formato — **sub-línea SIEMPRE presente** debajo de la línea de effort en el bloque ESTATUS, en cada turno de proyecto (aunque sea `👷 directo`):
+
+```
+│ 🎚️ EFFORT    <tacómetro> <tier>                   /effort
+│   🎭 ROLES   <íconos de la cadena> · porque <razón>
+```
+
+Es **obligatoria** (entra en la regla "nunca omite áreas" del candado como sub-línea fija de effort): si va directa muestra `👷 directo`, de modo que su **ausencia señala que la feature no corrió**. NO la calcula el hook (a diferencia de `💾` y `📊`): es juicio del Constructor, igual que el tier de effort.
