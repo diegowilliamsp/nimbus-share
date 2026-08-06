@@ -2,6 +2,33 @@
 
 Formato: [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) · Versionado: [SemVer](https://semver.org/lang/es/).
 
+## [1.5.0] — 2026-08-06
+
+### El router llegaba cortado — medidores primero, bloque inyectable, y modelo en el candado
+
+**Hallazgo medido en el motor y portado aquí.** El harness **corta la salida de un hook** que excede su tope (~13,9 KB observado): inyecta solo un preview de ~2 KB y persiste el resto a un archivo aparte. El `ROUTER.md` entregado entero llegaba a rozar ese tope con la **tabla trigger → escalón** y los **medidores calculados** al final — o sea, lo primero que se pierde es lo más caro de reconstruir a mano, y el ruteo pasa a correr de memoria del modelo: exactamente el fallo que el hook existía para evitar.
+
+#### Añadido
+
+- **Marcadores `NIMBUS:INYECTAR` en `flow/ROUTER.md`.** El hook entrega **solo** el bloque marcado (plantilla del ESTATUS + escaleras de modelo/effort + tabla trigger→escalón). Todo el porqué del diseño baja a una sección "El porqué" que se lee bajo demanda. Una sola fuente de verdad, sin archivo nuevo que desincronizar y sin tocar `install.sh`.
+- **Área `🤖 MODELO` en el ESTATUS**, con escalera de decisión de 7 escalones (la primera que matchea gana). La regla que más cuesta recordar: **una flota de sub-agentes HEREDA el modelo de sesión**, así que su costo se multiplica por N — nunca lanzar fan-out con el modelo más caro.
+- **Escalera de effort completa (5 tiers)** con tacómetros, **regla del empate** (irreversible → sube; reversible → baja y reintenta) y **effort por rol** dentro de un Workflow, que es donde se quema la cuota.
+- **Pre-match del escalón** contra `prompt_text`: sugerencia por palabra, sin autoridad, que el Constructor confirma o corrige. Requiere `jq`; sin él no se intenta (buscar sobre el JSON crudo daría falsos positivos con el `cwd`).
+- **Modelo y effort del turno**, de dos fuentes contrastadas: el **REAL** de la cola del transcript (lo que de verdad corrió) y el **DEFAULT** de `~/.claude/settings.json` (donde escriben `/model` y `/effort`, pero que solo guarda el default de sesiones nuevas). Si discrepan sale una línea `⚠️`: esa discrepancia **es la señal** de un override vivo. La comparación va por familia normalizada (`claude-opus-5` ≡ `opus[1m]`), si no toda sesión marcaría discrepancia falsa.
+
+#### Cambiado
+
+- **Orden de la salida del hook: lo calculado primero, la prosa nunca.** Si algo se corta, que sea lo reconstruible.
+- **`📊` se mide desde el último `/compact`**, no desde el inicio del archivo. El transcript nunca se recorta: medirlo entero dejaba el medidor pegado en 100% justo después de compactar — justo después de que él mismo lo pidió. Medido en el motor: 1.628.187 B de archivo contra 132.508 B reales (100% contra 8,8%).
+- Dos guards nuevos en el hook: si `ROUTER.md` no existe avisa visible; si faltan los marcadores avisa **y entrega el archivo entero** — nunca se queda callado.
+
+#### Verificado
+
+- Batería de 17 casos, **20/20 verde** contra este repo: stdin vacío/basura, sin transcript, fuera de repo git, `settings.json` ausente/malformado, router sin marcadores, `prompt_text` con comillas y emoji, sin `jq` en el PATH, transcript con y sin `compact_boundary`, mención escapada del marcador, discrepancia real vs default y familias equivalentes.
+- Salida del hook: **6.480 bytes** (antes: el router entero). Costo por turno ~130 ms sobre un transcript de 1,7 MB.
+- **Sincronizado sin drift:** `flow/ROUTER.md`, `flow/hooks/nimbus-router.sh`, `flow/CLAUDE.md.snippet`, `flow/FLUJO_PROYECTOS.md`, `flow/escalones/rebanada-ready.md`. Inventario propio respetado: `nimbus-onboarding` sí, `pipeline-reportes` no (14 escalones = 4+4+3+2+1). 0 PII en lo migrado.
+- Bump MINOR 1.4.0 → 1.5.0.
+
 ## [1.4.0] — 2026-06-23
 
 ### ESTATUS v3.5 + v3.6 — roles del pipeline + panel de instrumentos

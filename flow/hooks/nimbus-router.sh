@@ -1,8 +1,16 @@
 #!/usr/bin/env bash
-# Hook UserPromptSubmit de NIMBUS v3: entrega el router + el mandato del ESTATUS en cada turno,
-# y calcula el medidor de CONTEXTO + SESIÓN.
-# FAIL-OPEN: cualquier fallo de la medición => gauge "s/d"; el router y el turno NUNCA se rompen.
-# Diseño: NIMBUS v3 — carga dinámica por escalones + candado por hook.
+# Hook UserPromptSubmit de NIMBUS v3.7 — entrega los medidores calculados + el bloque
+# inyectable del router (marcadores NIMBUS:INYECTAR en ~/.claude/ROUTER.md).
+#
+# ORDEN DE LA SALIDA (regla de diseño, no estética): lo CALCULADO primero, la prosa nunca.
+# Motivo medido el 2026-08-06: el harness corta la salida de un hook que excede su tope
+# (~13.9 KB observado) e inyecta solo un preview de ~2 KB. Con el router entero (15.7 KB)
+# se perdían la tabla trigger→escalón Y los medidores. Ver ROUTER.md §"Por qué el bloque
+# va primero y es chico".
+#
+# FAIL-OPEN de ley: cualquier fallo de medición => "s/d"; el turno NUNCA se rompe.
+# Diseño y porqué de cada medidor: flow/ROUTER.md, sección "El porqué" (lo que va DEBAJO
+# del marcador NIMBUS:INYECTAR:FIN no se inyecta — se lee bajo demanda).
 
 # --- 1. Leer stdin (JSON del harness) sin colgar; tolerar ausencia ---
 input=""
@@ -10,28 +18,56 @@ if [ ! -t 0 ]; then
   input=$(cat 2>/dev/null)
 fi
 
+# --- 1b. Extractor de campos JSON: jq si existe, sed si no, vacío si nada ---
+# El hook puede correr con un PATH restringido, así que jq es opcional, nunca requisito.
+JQ=""
+for c in jq /opt/homebrew/bin/jq /usr/local/bin/jq /usr/bin/jq; do
+  if command -v "$c" >/dev/null 2>&1; then JQ="$c"; break; fi
+done
+
+json_str() {  # $1 = nombre del campo; imprime el valor o nada
+  local k="$1"
+  if [ -z "$input" ]; then return 0; fi
+  if [ -n "$JQ" ]; then
+    printf '%s' "$input" | "$JQ" -r --arg k "$k" '.[$k] // empty' 2>/dev/null
+  else
+    # Respaldo sin jq: sirve para valores simples (rutas, ids). No se usa para prompt_text.
+    printf '%s' "$input" | sed -n "s/.*\"$k\"[[:space:]]*:[[:space:]]*\"\([^\"]*\)\".*/\1/p" | head -1
+  fi
+}
+
+transcript=$(json_str transcript_path)
+sid=$(json_str session_id)
+
 # --- 2. Medidor CONTEXTO + SESIÓN (todo envuelto; nunca aborta el turno) ---
 gauge="⚪ s/d"
 {
-  CTX_FULL_BYTES=1500000   # tamaño de conversación (bytes del transcript) tratado como "lleno / conviene reiniciar"; tunable
-  CTX_AMBER_PCT=60         # ámbar   → recomendar /compact   (calibrable)
+  CTX_FULL_BYTES=1500000   # tamaño de conversación tratado como "lleno / conviene reiniciar"; tunable
+  CTX_AMBER_PCT=60         # ámbar   → recomendar /compact
   CTX_RED_PCT=80           # rojo    → recomendar /clear
   CTX_CRIT_PCT=92          # crítico → recomendar cerrar sesión
 
-  transcript=$(printf '%s' "$input" | sed -n 's/.*"transcript_path"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -1)
-  sid=$(printf '%s' "$input" | sed -n 's/.*"session_id"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -1)
-
-  # Contexto: bytes del transcript vs umbral de reinicio
   pct=""
   if [ -n "$transcript" ] && [ -f "$transcript" ]; then
-    bytes=$(wc -c < "$transcript" 2>/dev/null | tr -d ' ')
+    # Bytes DESDE el último /compact, no del archivo entero. El transcript nunca se
+    # recorta: al compactar el harness escribe una marca y SIGUE en el mismo archivo.
+    # Medir el archivo completo dejaba el medidor pegado en 100% justo después de
+    # compactar — o sea, justo después de que el propio medidor pidió compactar
+    # (medido 2026-08-06: 1,628,187 B de archivo vs 132,508 B reales = 100% vs 8.8%).
+    # El patrón va SIN escapar a propósito: cuando el marcador aparece citado dentro de
+    # texto de conversación va escapado (\"subtype\":\"...\"), así que hablar de él aquí
+    # no dispara un falso positivo. LC_ALL=C para que length() cuente BYTES, no glifos.
+    bytes=$(LC_ALL=C awk '
+      { tot += length($0) + 1 }
+      /"type":"system","subtype":"compact_boundary"/ { pre = tot - length($0) - 1 }
+      END { print tot - pre }
+    ' "$transcript" 2>/dev/null | tr -d ' ')
     if [ -n "$bytes" ] && [ "$bytes" -ge 0 ] 2>/dev/null; then
       pct=$(( bytes * 100 / CTX_FULL_BYTES ))
       [ "$pct" -gt 100 ] && pct=100
     fi
   fi
 
-  # Banda del medidor -> comando recomendado (verde=nada / ámbar=/compact / rojo=/clear / crítico=cerrar)
   ctx_cmd=""
   ctx_dot="🟢"
   if [ -n "$pct" ]; then
@@ -41,7 +77,6 @@ gauge="⚪ s/d"
     fi
   fi
 
-  # Sesión: tiempo + turnos, estado por sesión en ~/.claude/.nimbus-sessions/<sid>
   elapsed_lbl=""
   turns=""
   if [ -n "$sid" ]; then
@@ -70,7 +105,6 @@ gauge="⚪ s/d"
     fi
   fi
 
-  # Barra de contexto (10 celdas) + sesión
   if [ -n "$pct" ]; then
     fill=$(( pct / 10 ))
     [ "$fill" -gt 10 ] && fill=10
@@ -109,30 +143,114 @@ savestate=""
   fi
 } 2>/dev/null
 
-# --- 2c. Aviso de onboarding pendiente (NIMBUS aún sin personalizar) ---
-if [ -f "$HOME/.claude/.nimbus-onboarding-pending" ]; then
-  echo "NIMBUS sin configurar — di 'configura NIMBUS' (o /nimbus-setup) para personalizarlo a tu gusto."
-  echo ""
-fi
+# --- 2c. Modelo y effort — REAL (transcript) contrastado contra el default (settings) ---
+# Ninguno viene en el stdin del hook (el contrato de UserPromptSubmit trae session_id,
+# prompt_id, transcript_path, cwd, permission_mode, hook_event_name, prompt_text).
+# Dos fuentes, a propósito:
+#   REAL     = cola del transcript. Cada registro de assistant trae el modelo que corrió
+#              ("message":{"model":...) y el effort con el que corrió ("effort":...).
+#              Va un turno atrasado (es el turno anterior), pero es lo que DE VERDAD pasó.
+#   DEFAULT  = ~/.claude/settings.json, donde escriben /model y /effort. Es el default de
+#              sesiones NUEVAS: un override solo-para-esta-sesión no aparece aquí.
+# Si discrepan (comparando FAMILIA, no string), se marca — esa discrepancia es justo la
+# señal de que hay un override vivo, no un error.
+cfgline=""
+cfgwarn=""
+{
+  # Familia normalizada, para no marcar "claude-opus-5" vs "opus[1m]" como discrepancia.
+  fam() { printf '%s' "$1" | tr 'A-Z' 'a-z' | sed 's/claude-//; s/\[1m\]//; s/-[0-9].*$//' | tr -cd 'a-z'; }
 
-# --- 3. Router (con guard) ---
-if [ ! -f "$HOME/.claude/ROUTER.md" ]; then
+  rm_=""; re_=""
+  if [ -n "$transcript" ] && [ -f "$transcript" ]; then
+    # Solo la cola: barato aunque el transcript pese megas. `isSidechain":false` descarta
+    # a los sub-agentes, que pueden correr con otro modelo y falsearían la lectura.
+    tailbuf=$(tail -c 300000 "$transcript" 2>/dev/null | grep '"isSidechain":false' 2>/dev/null)
+    rm_=$(printf '%s\n' "$tailbuf" | grep -o '"message":{"model":"[^"]*"' | tail -1 | sed 's/.*"model":"//; s/"$//')
+    re_=$(printf '%s\n' "$tailbuf" | grep -o '"effort":"[a-z]*"'          | tail -1 | sed 's/.*:"//; s/"$//')
+  fi
+
+  sm=""; se=""
+  S="$HOME/.claude/settings.json"
+  if [ -f "$S" ]; then
+    if [ -n "$JQ" ]; then
+      sm=$("$JQ" -r '.model // empty' "$S" 2>/dev/null)
+      se=$("$JQ" -r '.effortLevel // empty' "$S" 2>/dev/null)
+    else
+      sm=$(sed -n 's/.*"model"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' "$S" | head -1)
+      se=$(sed -n 's/.*"effortLevel"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' "$S" | head -1)
+    fi
+  fi
+
+  if [ -n "$rm_" ] || [ -n "$re_" ]; then
+    cfgline="🤖 ${rm_:-s/d} · 🎚️ ${re_:-s/d}   ← REAL, lo que corrió el turno pasado; recomienda CONTRA esto"
+    dm=""; de=""
+    [ -n "$rm_" ] && [ -n "$sm" ] && [ "$(fam "$rm_")" != "$(fam "$sm")" ] && dm="modelo=${sm}"
+    [ -n "$re_" ] && [ -n "$se" ] && [ "$re_" != "$se" ]                   && de="effort=${se}"
+    if [ -n "$dm" ] || [ -n "$de" ]; then
+      cfgwarn="   ⚠️ settings.json (default de sesiones nuevas) dice ${dm}${dm:+ }${de} — hay override vivo en ESTA sesión"
+    fi
+  elif [ -n "$sm" ] || [ -n "$se" ]; then
+    # Sin transcript legible: se cae al default, con la etiqueta honesta.
+    cfgline="🤖 ${sm:-s/d} · 🎚️ ${se:-s/d}   ← default de settings.json (no pude leer el turno real)"
+  fi
+} 2>/dev/null
+
+# --- 2d. Pre-match del escalón contra prompt_text (SUGERENCIA, sin autoridad) ---
+# El match por palabras se rompe con paráfrasis; quien entiende la frase es el Constructor.
+# Sirve de red: si el hook propone y el Constructor no carga nada, algo se saltó.
+# Sin jq NO se intenta: extraer prompt_text con sed es frágil (comillas/saltos escapados)
+# y buscar sobre el JSON crudo daría falsos positivos con el cwd (ej. ".../PROYECTOS/...").
+prematch=""
+{
+  if [ -n "$JQ" ] && [ -n "$input" ]; then
+    ptext=$(printf '%s' "$input" | "$JQ" -r '.prompt_text // empty' 2>/dev/null)
+    if [ -n "$ptext" ]; then
+      hits=""
+      add() { case " $hits " in *" $1 "*) ;; *) hits="$hits $1";; esac; }
+      p() { printf '%s' "$ptext" | grep -qiE "$1" 2>/dev/null && add "$2"; }
+      p 'proyecto nuevo|empecemos|voy a empezar|abramos|hagamos un proyecto'  'proyecto-nuevo'
+      p 'sigamos con|continuemos con|retomemos|seguimos con'                  'proyecto-continuar'
+      p 'adopta|adoptarlo|registra este proyecto|usa nimbus'                  'adoptar-proyecto'
+      p 'archiva|borra el proyecto|elimina el proyecto|t[íi]ralo'             'proyecto-borrar-archivar'
+      p 'trabado|atorado|bug duro|regresi[óo]n de performance'                'claude-trabado'
+      p 'eval[úu]a|qu[ée] uso para|build vs reuse|comp[áa]rame'               'evaluacion-herramientas'
+      p 'instala|integra|clona este repo|agregu?emos dep|agrega dep'          'seguridad-externos'
+      p 'vale la pena empezar|riesgo de plataforma|saqu[ee]n? esto nativo'    'filtro-plataforma'
+      p 'guarda esta idea|anota esta idea|anota esto en ideas|descarta la idea' 'ideas-crudas'
+      p 'configura nimbus|personaliza nimbus|onboarding|setup nimbus|nimbus-setup' 'nimbus-onboarding'
+      p 'nos vemos|ah[íi] la dejamos|ya cerramos|c[óo]rtale|cerramos sesi[óo]n' 'cierre-sesion'
+      p 'pre-commit|reset --hard|force push|git destructivo'                  'mecanica-git'
+      [ -n "$hits" ] && prematch="🧩 posible escalón:${hits}  ← sugerencia por palabra; confirma o corrige"
+    fi
+  fi
+} 2>/dev/null
+
+# --- 3. SALIDA: lo calculado PRIMERO (sobrevive cualquier corte del harness) ---
+echo "━━ NIMBUS · medido por el hook — copiar TAL CUAL en el ESTATUS ━━"
+[ -n "$savestate" ] && echo "💾 GUARDADO   ${savestate}"
+echo "📊 CONTEXTO   ${gauge}"
+[ -n "$cfgline" ]   && echo "${cfgline}"
+[ -n "$cfgwarn" ]   && echo "${cfgwarn}"
+[ -n "$prematch" ]  && echo "${prematch}"
+echo ""
+
+# --- 4. Bloque inyectable del router (una sola fuente de verdad: ~/.claude/ROUTER.md) ---
+R="$HOME/.claude/ROUTER.md"
+if [ ! -f "$R" ]; then
   echo "AVISO NIMBUS: ~/.claude/ROUTER.md no encontrado — router no cargado. Revisar symlink / install.sh."
 else
-  cat "$HOME/.claude/ROUTER.md"
+  blk=$(awk '/NIMBUS:INYECTAR:INICIO/{f=1;next} /NIMBUS:INYECTAR:FIN/{f=0} f' "$R" 2>/dev/null)
+  if [ -n "$blk" ]; then
+    printf '%s\n' "$blk"
+  else
+    # Marcadores ausentes o rotos: NO quedarse callado — entregar el router entero.
+    echo "AVISO NIMBUS: no encontré los marcadores NIMBUS:INYECTAR en ROUTER.md — entrego el router completo (puede truncarse)."
+    cat "$R"
+  fi
 fi
 
-# --- 4. Medición de este turno + recordatorio de la ley (ESTATUS al final) ---
+# --- 5. Recordatorio de la ley (corto: la plantilla canónica ya va arriba) ---
 echo ""
-[ -n "$savestate" ] && echo "ESTADO DE GUARDADO (úsalo TAL CUAL en la línea '💾 guardado' del bloque ESTATUS): ${savestate}"
-echo "MEDIDOR DE ESTE TURNO (estimación; úsalo TAL CUAL en la línea '📊 contexto' del bloque ESTATUS): ${gauge}"
-echo ""
-echo "RECORDATORIO DE LEY (NIMBUS): en CADA turno, CIERRA tu respuesta (SIEMPRE al final, nunca arriba)"
-echo "con el bloque ESTATUS enmarcado — formato canónico en ROUTER.md §Candado: líneas con ícono"
-echo "(🎚️ effort con medidor [+ sub-línea 🎭 roles del pipeline SIEMPRE debajo — 👷 directo por default] ·"
-echo "🧩 escalón(es)+conteo · 📊 contexto usando el MEDIDOR de arriba · y según"
-echo "el caso ✅ se hizo / ▶️ sigue (roadmap) / ⏳ esperando si es fuera de roadmap). Carga SOLO ese(esos)"
-echo "escalón(es) de ~/.claude/escalones/. NUNCA omitas el ESTATUS: trivial o ack => variante 'escalón 0'."
-echo ""
-echo "SEGURIDAD: si el medidor de arriba trae '→ /compact' o '→ /clear', PRIMERO commitea el trabajo SIN"
-echo "pedir permiso (solo es guardar, autorizado por el Director) — recomendar limpiar contexto implica que TODO está guardado."
+echo "LEY NIMBUS: cierra CADA respuesta con el bloque ESTATUS de arriba, SIEMPRE al final."
+echo "Nunca lo omitas: trivial o ack => variante 'escalón 0' (💾 + 🧩 + 📊)."
+echo "Carga SOLO el/los escalón(es) que apliquen, de ~/.claude/escalones/."

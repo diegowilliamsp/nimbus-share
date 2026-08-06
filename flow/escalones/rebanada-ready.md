@@ -29,13 +29,21 @@ Si falta una de las 5 → no arrancar. Resolver primero (preguntar, grillear, co
 
 Una vez la rebanada pasa el DoR y ANTES de empezar a codear, el Constructor recomienda al Director qué nivel de esfuerzo de razonamiento de Opus usar para esa rebanada, con la razón en una línea. El Director aprueba o lo mueve. **El Constructor solo recomienda — no puede cambiar su propio effort a media sesión; el switch lo mueve el Director.** No es condición de gating del DoR (no se bloquea el arranque por esto); es un paso de cierre del DoR.
 
-Escala de esfuerzo (eje distinto de `ultracode`):
+Escala de esfuerzo (eje distinto de `ultracode`). **La escalera operativa vive en `ROUTER.md` §🎚️ EFFORT y el hook la inyecta cada turno** — aquí está el detalle de los tiers que tocan una rebanada:
 
-| Tier | Cuándo |
-|---|---|
-| **high** | Default. Rebanada normal: lógica clara, pocos archivos, sin incertidumbre técnica fuerte. |
-| **xhigh** | Varias incertidumbres técnicas activas, refactor que toca varios módulos, diseño no trivial. |
-| **max** | Decisión arquitectónica, debugging duro (`/diagnose`), o acción de reversibilidad incierta/cara (lo irreversible sube el tier, no la confianza). |
+| Tier | Tacómetro | Cuándo |
+|---|---|---|
+| **low** | `⚪ ▰▱▱▱▱` | Fuera de rebanada: ack, leer, buscar, correr un comando. |
+| **medium** | `🔵 ▰▰▱▱▱` | Fuera de rebanada: conversar, explicar, edit chico de un archivo. |
+| **high** | `🟢 ▰▰▰▱▱` | Default y **piso del trabajo de proyecto**. Rebanada normal: lógica clara, pocos archivos, sin incertidumbre técnica fuerte. |
+| **xhigh** | `🟡 ▰▰▰▰▱` | Varias incertidumbres técnicas activas, refactor que toca varios módulos, diseño no trivial. |
+| **max** | `🔴 ▰▰▰▰▰` | Decisión arquitectónica, debugging duro (`/diagnose`), o acción de reversibilidad incierta/cara (lo irreversible sube el tier, no la confianza). |
+
+**Regla del empate:** si dudas y la acción es **irreversible** → sube de tier. Si es reversible → baja y reintenta si falla. El costo de quedarse corto en algo reversible es un reintento; en algo irreversible es algo que no se deshace.
+
+**En Workflow el effort se pone POR ROL**, no para toda la flota: los roles mecánicos y los refutadores van `low`–`high`, los auditores y jueces `xhigh`. Una flota entera en el tier más alto es donde se quema la cuota.
+
+**El modelo se elige junto con el effort** — son la misma decisión con dos perillas. La escalera de modelo (con la regla de que una flota HEREDA el modelo de sesión y multiplica su costo por N) está en `ROUTER.md` §🤖 MODELO, inyectada cada turno.
 
 `ultracode` **no es un tier de esfuerzo** — es un eje aparte: activa orquestación multi-agente (sub-agentes en paralelo, review adversarial), cuesta muchos más tokens y es de pago. El Constructor lo sugiere por separado cuando la rebanada se beneficia de barrido exhaustivo (auditoría amplia, review adversarial, migración grande); el Director lo confirma siempre explícito. Nunca se asume.
 
