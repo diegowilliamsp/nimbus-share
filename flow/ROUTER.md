@@ -14,7 +14,7 @@
 │ ▶️ sigue    · <siguiente del roadmap>  · fuera de roadmap: ⏳ dime qué sigue
 │ ╶────────────────────────────────────────────────
 │ 💾 GUARDADO  <TAL CUAL del hook>
-│ 🤖 MODELO    <recomendado> · <razón corta>            /model
+│ 🤖 MODELO    <recomendado> · escalón <n> — <razón>    /model
 │ 🎚️ EFFORT    <tacómetro> <tier>                       /effort
 │   🎭 ROLES   <íconos> · <razón corta>
 │ 🧩 ESCALÓN   <riel de estaciones, ◆ en la actual>
@@ -25,6 +25,7 @@
 
 **Nunca omite áreas.** Única excepción: **escalón 0** (NIMBUS inactivo este turno) = solo `💾` + `🧩 0 — nada que cargar` + `📊`.
 `💾` y `📊` se copian **TAL CUAL** del hook. `🤖`, `🎚️`, `🎭`, `🧩` los pinta el Constructor por juicio.
+**`🤖` cita el escalón de la escalera del que sale** (`escalón 4 — cruza varios módulos`). Si ninguno aplica, escribir `sin escalón — juicio` y la razón: inventar un escalón para justificar una corazonada previa es el fallo que esto existe para atrapar.
 🎭 Roles: 🔄 Transformador · 🧠 Analista · 👷 Constructor · 🔍 Auditor (el Director eres tú, 🧭). Default `👷 directo`. `👷→🔍` cierre con código nuevo · `🧠→👷→🔍` decisión arquitectónica o dep nueva · `🔄→🧠→👷→🔍` idea cruda ambigua.
 
 ## 🤖 MODELO — escalera de decisión (la primera que matchea gana)
@@ -128,6 +129,12 @@ De ahí las dos reglas de diseño de la salida del hook, en este orden:
 Se muestra el REAL; si discrepa del DEFAULT se agrega una línea `⚠️`, porque esa discrepancia **es la señal** de que hay un override vivo, no un error. La comparación va por **familia normalizada** (`claude-opus-5` ≡ `opus[1m]`): comparar los strings crudos marcaría discrepancia en toda sesión y el aviso se volvería ruido que se ignora.
 
 **El Constructor NO auto-cambia modelo ni effort a media sesión.** Recomienda; los switches los mueve el Director con `/model` y `/effort`.
+
+**Por qué `🤖` cita el escalón en vez de calcularse.** El riesgo de que la recomendación de modelo sea capricho es real. Se evaluaron tres salidas y se eligió la primera:
+
+- **Citar el escalón de la escalera** (elegida). No vuelve al Constructor más acertado eligiendo — lo vuelve **revisable**. El fallo que atrapa es la racionalización *post hoc*: justificar después una corazonada de antes. De ahí el candado de escribir `sin escalón — juicio` cuando ninguno aplica, en lugar de inventar uno que encaje.
+- **Que el hook sugiera el modelo por palabras**, como ya sugiere el escalón. Descartada: mismo acierto bajo que el pre-match, pero con un defecto que el pre-match no tiene — **ancla**. Un escalón mal sugerido se cacha al leer la petición; un modelo sugerido antes de pensar sesga sin que se note.
+- **Bitácora de gasto por modelo/effort** (aplazada, no descartada). El hook ya sabe qué corrió cada turno, así que es barata. Pero sin señal de calidad al lado del costo, los datos solo empujan hacia el modelo más barato siempre, que es la lección equivocada. Reconsiderar cuando el dolor sea la **cuota** (turnos por modelo contra qué tan rápido se quema la ventana): esa pregunta sí se responde solo con costo.
 
 ## Por qué el pre-match del escalón es una sugerencia y no una decisión
 

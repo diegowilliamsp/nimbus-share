@@ -2,6 +2,18 @@
 
 Formato: [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) · Versionado: [SemVer](https://semver.org/lang/es/).
 
+## [1.5.1] — 2026-08-06
+
+### La recomendación de modelo ahora cita su regla
+
+El área `🤖 MODELO` pasa de `<recomendado> · <razón corta>` a `<recomendado> · escalón <n> — <razón>`: la recomendación cita el escalón de la escalera del que sale. No vuelve al Constructor más acertado eligiendo — lo vuelve **revisable**, y el fallo que atrapa es la racionalización *post hoc* (justificar después una corazonada de antes). Candado: si ningún escalón aplica, se escribe `sin escalón — juicio` con la razón, en vez de inventar uno que encaje.
+
+- **Descartada:** que el hook sugiera el modelo por palabras. Mismo acierto bajo que el pre-match, pero con **ancla**: un escalón mal sugerido se cacha al leer la petición; un modelo sugerido antes de pensar sesga sin que se note.
+- **Aplazada, no descartada:** bitácora de gasto por modelo/effort. Barata, pero sin señal de calidad al lado del costo los datos solo empujan al modelo más barato siempre. Reconsiderar cuando el dolor sea la cuota.
+- Registro de la decisión y de las alternativas en `ROUTER.md` §"El porqué".
+- Bloque inyectable: 5.879 → 6.148 bytes. Batería 20/20 verde.
+- Bump PATCH 1.5.0 → 1.5.1.
+
 ## [1.5.0] — 2026-08-06
 
 ### El router llegaba cortado — medidores primero, bloque inyectable, y modelo en el candado
